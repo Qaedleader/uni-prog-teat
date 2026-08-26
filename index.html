@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Uni Prog Teat - Task Demo</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<main>
+
+  <section id="loading-view">
+    <p class="muted">Loading...</p>
+  </section>
+
+  <section id="login-view" class="card hidden">
+    <h1>Task Demo</h1>
+    <p class="muted">Firebase Authentication + Cloud Firestore</p>
+    <form id="login-form">
+      <label for="email">Email</label>
+      <input id="email" type="email" autocomplete="username" required>
+      <label for="password">Password</label>
+      <input id="password" type="password" autocomplete="current-password" required>
+      <button type="submit">Login</button>
+    </form>
+    <p id="login-error" class="error"></p>
+  </section>
+
+  <section id="dashboard-view" class="hidden">
+    <header>
+      <div>
+        <h1 id="user-name"></h1>
+        <p class="muted">UID: <span id="user-uid"></span></p>
+      </div>
+      <button id="logout-button" class="secondary">Logout</button>
+    </header>
+
+    <form id="task-form" class="card">
+      <h2>New task</h2>
+      <input id="task-title" type="text" placeholder="Title" required>
+      <input id="task-description" type="text" placeholder="Description" required>
+      <input id="task-due" type="date" required>
+      <select id="task-status">
+        <option value="pending">pending</option>
+        <option value="in_progress">in_progress</option>
+        <option value="completed">completed</option>
+      </select>
+      <button type="submit">Add task</button>
+    </form>
+
+    <h2>My tasks</h2>
+    <ul id="task-list"></ul>
+    <p id="task-empty" class="muted hidden">No tasks yet.</p>
+  </section>
+
+</main>
+<script type="module" src="app.js"></script>
+</body>
+</html>

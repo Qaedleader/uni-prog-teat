@@ -1,0 +1,82 @@
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  padding: 32px 16px;
+  font-family: system-ui, "Segoe UI", Arial, sans-serif;
+  background: #f4f6f8;
+  color: #1f2933;
+}
+
+main {
+  max-width: 640px;
+  margin: 0 auto;
+}
+
+h1 { font-size: 22px; margin: 0 0 4px; }
+h2 { font-size: 16px; margin: 24px 0 8px; }
+h3 { font-size: 15px; margin: 0 0 4px; }
+
+.muted { color: #6b7280; font-size: 13px; margin: 0 0 16px; }
+.hidden { display: none; }
+
+.card {
+  background: #fff;
+  border: 1px solid #e2e6ea;
+  border-radius: 8px;
+  padding: 24px;
+}
+
+#login-view { max-width: 340px; margin: 80px auto; }
+
+label { display: block; font-size: 13px; margin-bottom: 4px; }
+
+input, select {
+  width: 100%;
+  padding: 8px 10px;
+  margin-bottom: 12px;
+  border: 1px solid #cbd2d9;
+  border-radius: 6px;
+  font: inherit;
+  background: #fff;
+}
+
+button {
+  padding: 8px 16px;
+  border: 0;
+  border-radius: 6px;
+  background: #1a73e8;
+  color: #fff;
+  font: inherit;
+  cursor: pointer;
+}
+
+button.secondary {
+  background: #fff;
+  color: #1f2933;
+  border: 1px solid #cbd2d9;
+}
+
+.error { color: #c5221f; font-size: 13px; min-height: 18px; margin: 12px 0 0; }
+
+header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 24px;
+}
+
+ul { list-style: none; padding: 0; margin: 0; }
+
+.task {
+  background: #fff;
+  border: 1px solid #e2e6ea;
+  border-radius: 8px;
+  padding: 16px;
+  margin-bottom: 12px;
+}
+
+.task p { margin: 0 0 8px; font-size: 14px; }
+
+.actions { display: flex; gap: 8px; align-items: center; }
+.actions select { width: 160px; margin: 0; }
