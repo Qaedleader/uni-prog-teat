@@ -4,6 +4,8 @@ service cloud.firestore {
   match /databases/{database}/documents {
 
     // Each signed-in user may only read and write their own profile document.
+    // "write" also covers the create made at signup, and the document ID must
+    // be the signed-in UID, so nobody can create a profile for someone else.
     match /users/{uid} {
       allow read, write: if request.auth != null && request.auth.uid == uid;
     }

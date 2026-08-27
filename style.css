@@ -80,3 +80,13 @@ ul { list-style: none; padding: 0; margin: 0; }
 
 .actions { display: flex; gap: 8px; align-items: center; }
 .actions select { width: 160px; margin: 0; }
+
+.switch { font-size: 13px; color: #6b7280; margin: 12px 0 0; }
+
+button.link {
+  background: none;
+  padding: 0;
+  color: #1a73e8;
+  font-size: 13px;
+  text-decoration: underline;
+}

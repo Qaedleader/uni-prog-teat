@@ -16,6 +16,7 @@
   <section id="login-view" class="card hidden">
     <h1>Task Demo</h1>
     <p class="muted">Firebase Authentication + Cloud Firestore</p>
+
     <form id="login-form">
       <label for="email">Email</label>
       <input id="email" type="email" autocomplete="username" required>
@@ -23,7 +24,25 @@
       <input id="password" type="password" autocomplete="current-password" required>
       <button type="submit">Login</button>
     </form>
-    <p id="login-error" class="error"></p>
+    <p id="signup-switch" class="switch">
+      <button id="show-signup" type="button" class="link">Create account</button>
+    </p>
+
+    <form id="signup-form" class="hidden">
+      <label for="signup-name">Display Name</label>
+      <input id="signup-name" type="text" autocomplete="name" required>
+      <label for="signup-email">Email</label>
+      <input id="signup-email" type="email" autocomplete="username" required>
+      <label for="signup-password">Password</label>
+      <input id="signup-password" type="password" autocomplete="new-password" required>
+      <button type="submit">Create Account</button>
+    </form>
+    <p id="login-switch" class="switch hidden">
+      Already have an account?
+      <button id="show-login" type="button" class="link">Login</button>
+    </p>
+
+    <p id="auth-error" class="error"></p>
   </section>
 
   <section id="dashboard-view" class="hidden">

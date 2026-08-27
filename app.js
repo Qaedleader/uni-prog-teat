@@ -1,9 +1,10 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-app.js";
 import {
-  getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged
+  getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword,
+  signOut, onAuthStateChanged
 } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-auth.js";
 import {
-  getFirestore, collection, doc, getDoc, getDocs, addDoc, updateDoc, deleteDoc,
+  getFirestore, collection, doc, getDoc, getDocs, setDoc, addDoc, updateDoc, deleteDoc,
   query, where, Timestamp
 } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-firestore.js";
 import { firebaseConfig } from "./firebase-config.js";
@@ -18,7 +19,10 @@ const loadingView = document.getElementById("loading-view");
 const loginView = document.getElementById("login-view");
 const dashboardView = document.getElementById("dashboard-view");
 const loginForm = document.getElementById("login-form");
-const loginError = document.getElementById("login-error");
+const signupForm = document.getElementById("signup-form");
+const loginSwitch = document.getElementById("login-switch");
+const signupSwitch = document.getElementById("signup-switch");
+const authError = document.getElementById("auth-error");
 const taskForm = document.getElementById("task-form");
 const taskList = document.getElementById("task-list");
 const taskEmpty = document.getElementById("task-empty");
@@ -33,13 +37,84 @@ function show(view) {
   view.classList.remove("hidden");
 }
 
-onAuthStateChanged(auth, async (user) => {
-  if (!user) {
-    owner = null;
-    show(loginView);
+// The same card is used for both modes; only one form is visible at a time.
+function showLogin() {
+  authError.textContent = "";
+  loginForm.classList.remove("hidden");
+  signupSwitch.classList.remove("hidden");
+  signupForm.classList.add("hidden");
+  loginSwitch.classList.add("hidden");
+  show(loginView);
+}
+
+function showSignup() {
+  authError.textContent = "";
+  loginForm.classList.add("hidden");
+  signupSwitch.classList.add("hidden");
+  signupForm.classList.remove("hidden");
+  loginSwitch.classList.remove("hidden");
+  show(loginView);
+}
+
+// Short human-readable text for the Firebase error codes we expect here.
+function errorMessage(error, fallback) {
+  if (error.code === "auth/email-already-in-use") return "That email is already registered.";
+  if (error.code === "auth/invalid-email") return "That email address is not valid.";
+  if (error.code === "auth/weak-password") return "Password must be at least 6 characters.";
+  if (error.code === "auth/network-request-failed") return "Network error. Please try again.";
+  return fallback;
+}
+
+async function login(event) {
+  event.preventDefault();
+  authError.textContent = "";
+  const email = document.getElementById("email").value;
+  const password = document.getElementById("password").value;
+  try {
+    await signInWithEmailAndPassword(auth, email, password);
+  } catch (error) {
+    authError.textContent = errorMessage(error, "Login failed. Check your email and password.");
+  }
+}
+
+async function signup(event) {
+  event.preventDefault();
+  authError.textContent = "";
+
+  const displayName = document.getElementById("signup-name").value.trim();
+  const email = document.getElementById("signup-email").value.trim();
+  const password = document.getElementById("signup-password").value;
+
+  if (!displayName) {
+    authError.textContent = "Please enter a display name.";
+    return;
+  }
+  if (password.length < 6) {
+    authError.textContent = "Password must be at least 6 characters.";
     return;
   }
 
+  try {
+    // Firebase Authentication creates the account and returns the UID.
+    const credential = await createUserWithEmailAndPassword(auth, email, password);
+    const user = credential.user;
+
+    // The UID is used as the document ID, so auth and Firestore stay in sync.
+    await setDoc(doc(db, "users", user.uid), { displayName: displayName, email: email });
+
+    // The auth listener may have run before the profile existed, so load it again.
+    signupForm.reset();
+    await loadUser(user);
+  } catch (error) {
+    authError.textContent = errorMessage(error, "Could not create the account.");
+  }
+}
+
+function logout() {
+  signOut(auth);
+}
+
+async function loadUser(user) {
   owner = doc(db, "users", user.uid);
   const profile = await getDoc(owner);
 
@@ -49,21 +124,7 @@ onAuthStateChanged(auth, async (user) => {
 
   show(dashboardView);
   loadTasks();
-});
-
-loginForm.addEventListener("submit", async (event) => {
-  event.preventDefault();
-  loginError.textContent = "";
-  const email = document.getElementById("email").value;
-  const password = document.getElementById("password").value;
-  try {
-    await signInWithEmailAndPassword(auth, email, password);
-  } catch (error) {
-    loginError.textContent = "Login failed. Check your email and password.";
-  }
-});
-
-document.getElementById("logout-button").addEventListener("click", () => signOut(auth));
+}
 
 async function loadTasks() {
   const snapshot = await getDocs(query(collection(db, "tasks"), where("owner", "==", owner)));
@@ -114,7 +175,7 @@ function renderTask(task) {
   return item;
 }
 
-taskForm.addEventListener("submit", async (event) => {
+async function addTask(event) {
   event.preventDefault();
   await addDoc(collection(db, "tasks"), {
     title: document.getElementById("task-title").value,
@@ -125,6 +186,22 @@ taskForm.addEventListener("submit", async (event) => {
   });
   taskForm.reset();
   loadTasks();
+}
+
+onAuthStateChanged(auth, (user) => {
+  if (user) {
+    loadUser(user);
+  } else {
+    owner = null;
+    showLogin();
+  }
 });
+
+loginForm.addEventListener("submit", login);
+signupForm.addEventListener("submit", signup);
+taskForm.addEventListener("submit", addTask);
+document.getElementById("show-signup").addEventListener("click", showSignup);
+document.getElementById("show-login").addEventListener("click", showLogin);
+document.getElementById("logout-button").addEventListener("click", logout);
 
 show(loadingView);
