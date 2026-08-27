@@ -15,14 +15,15 @@ Every item in section 7 was checked against live systems, not against configurat
 | Project number | 477893747962 |
 | Web App | "Uni Prog Teat Web" - created, config used by the site |
 | Cloud Firestore | Created, Native mode, Standard edition, location `nam5` |
-| Authentication | Enabled, 2 test users |
+| Authentication | Enabled, Email/Password signup + login, 4 test users |
 | Email/Password provider | Enabled |
-| Collections | `users` (2 documents), `tasks` (5 documents) |
+| Collections | `users` (4 documents), `tasks` (5 documents) |
 | Security Rules | Written and deployed (`firestore.rules`) |
 | Allowed case | PASSED - each user reads their own profile and their own tasks |
 | Denied case | PASSED - User B receives `permission-denied` for User A's data |
 
-Two fake demo accounts were created ("Student One", "Student Two"). No real personal
+Four fake demo accounts exist ("Student One", "Student Two", and "Student Three" /
+"Student Four" created through the Signup form). No real personal
 data was used and no passwords are stored in this repository.
 
 ## 3. Firestore Structure
@@ -109,7 +110,46 @@ and in the browser on the live site while signed in as User B. Both returned
 `PERMISSION_DENIED` for User A's task document, User A's profile document, and a query
 filtered on User A's owner reference.
 
-## 8. University Demonstration Order
+## 8. Signup Flow
+
+Email/Password signup was added to the existing login card. The card toggles between
+Login and Signup; Signup asks only for display name, email and password.
+
+    Signup form
+      -> createUserWithEmailAndPassword
+      -> Firebase Authentication account + user.uid
+      -> users/{uid} with displayName and email
+      -> user is signed in
+      -> dashboard
+
+The Authentication UID is the Firestore document ID, so no second random document is
+created. Signup writes only the account and the profile document; no tasks are created
+and the five sample tasks are untouched. An empty list shows "No tasks yet.".
+
+Validation is minimal - display name not empty, browser email validation, password at
+least 6 characters - plus short messages for the Firebase errors `email-already-in-use`,
+`invalid-email`, `weak-password` and `network-request-failed`.
+
+The `/users/{uid}` rule already allowed this: `write` includes `create` and the document
+ID must equal `request.auth.uid`. No rule was loosened.
+
+Verified on the production site https://uni-prog-teat.vercel.app:
+
+| Check | Result |
+| --- | --- |
+| Signup creates a Firebase Authentication account | VERIFIED - `student.four@example.com`, UID `adxgiW7tMUN39B05OM6ugrDMIVm2` |
+| UID used as the Firestore document ID | VERIFIED - `users/adxgiW7tMUN39B05OM6ugrDMIVm2` |
+| Profile stored | VERIFIED - `displayName: "Student Four"`, `email: "student.four@example.com"` |
+| Dashboard after signup, UID matches Authentication | VERIFIED - empty list shows "No tasks yet." |
+| No tasks created by signup | VERIFIED - owner query returned no documents |
+| Duplicate email rejected | VERIFIED - "That email is already registered." |
+| Logout, then login with the new account | VERIFIED |
+| Existing accounts still log in | VERIFIED - `student.one@example.com`, same 3 tasks |
+
+A second fake account, `student.three@example.com` (UID `8zFMoiVWuJcXHTBB2nl8kQDAiIr2`),
+was created the same way while testing locally.
+
+## 9. University Demonstration Order
 
 1. Open the Vercel website - https://uni-prog-teat.vercel.app
 2. Show the login page.
@@ -124,15 +164,16 @@ filtered on User A's owner reference.
 11. Explain the allowed case and the denied case (section 7 above).
 12. Log in on the website and show the live task dashboard.
 
-## 9. Important URLs
+## 10. Important URLs
 
 - GitHub repository: https://github.com/Qaedleader/uni-prog-teat
 - Vercel production website: https://uni-prog-teat.vercel.app
 - Firebase Console project: `uni-prog-teat` ("Uni Prog Teat")
 
-Demo account emails are `student.one@example.com` and `student.two@example.com`.
+Demo account emails are `student.one@example.com`, `student.two@example.com`,
+`student.three@example.com` and `student.four@example.com`.
 Their passwords are deliberately not recorded in this repository.
 
-## 10. Blockers
+## 11. Blockers
 
 None.

@@ -5,7 +5,8 @@ and Firestore Security Rules for a university field-training discussion.
 
 ## Flow
 
-    Login (email + password)
+    Signup (display name + email + password) -> users/{uid}
+    Login  (email + password)
       -> Firebase Authentication
       -> user.uid
       -> users/{uid}
